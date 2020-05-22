@@ -1,0 +1,79 @@
+<h1>Movie Planner</h1>
+
+<ul>
+    {{#each movies}}
+    <li>
+        <p>
+            {{this.id}}. {{this.movie}}
+            <button data-movieid="{{this.id}}" class="delMovie">Delete Movie</button>
+        </p>
+    </li>
+    {{/each}}
+</ul>
+
+<h2>Add a Movie</h2>
+<form id="createMovie" class="button-size">
+    <textarea type="text" name="movie"></textarea>
+    <button type="submit">Save Movie</button>
+</form>
+
+<h2>Update your Movies</h2>
+<form id="updateMovie" class="button-size">
+    <select name="id">
+        {{#each movies}}
+        <option value="{{this.id}}">{{this.movie}}</option>
+        {{/each}}
+    </select>
+    <textarea type="text" name="movie" placeholder="movie name"></textarea>
+    <button type="submit">Update Movie</button>
+</form>
+
+<script type="text/javascript">
+    $(".delMovie").on("click", function (event) {
+        let id = $(this).data("movieid");
+        console.log(id);
+        $.ajax("/api/movies/" + id, {
+            type: "DELETE"
+        }).then(
+            function () {
+                console.log("Deleted ID ", id);
+                location.reload();
+            }
+        );
+    });
+
+    $("#createMovie").on("submit", function (event) {
+        event.preventDefault();
+        let newMovie = {
+            movie: $("#createMovie [name=movie]").val().trim()
+        };
+
+        $.ajax("/api/movies", {
+            type: "POST",
+            data: newMovie
+        }).then(
+            function () {
+                console.log("Added new movie");
+                location.reload();
+            }
+        );
+    });
+
+    $("#updateMovie").on("submit", function (event) {
+        event.preventDefault();
+        let id = $("[name=id]").val().trim();
+        let updatedMovie = {
+            movie: $("#updateMovie [name=movie]").val().trim()
+        };
+
+        $.ajax("/api/movies/" + id, {
+            type: "PUT",
+            data: updatedMovie
+        }).then(
+            function () {
+                console.log("Updated ID ", id);
+                location.reload();
+            }
+        );
+    });
+</script>
